@@ -37,14 +37,15 @@ export class GraficoDeRosca implements ComponentFramework.StandardControl<IInput
     this._circle.setAttribute("r", "40");
     this._circle.setAttribute("fill", "none");
     this._circle.setAttribute("stroke", "#ddd");
-    this._circle.setAttribute("stroke-width", "10");
+    this._circle.setAttribute("stroke-width", "20");
     this._circle.setAttribute("stroke-dasharray", "251.2");
     this._circle.setAttribute("stroke-dashoffset", "251.2");
 
     // Criação do texto
     this._text = document.createElementNS("http://www.w3.org/2000/svg", "text");
     this._text.setAttribute("x", "50");
-    this._text.setAttribute("y", "55");
+    this._text.setAttribute("y", "50%"); // Alterado para "50%"
+    this._text.setAttribute("dy", "0.35em"); // Adicionado para ajustar o alinhamento vertical
     this._text.setAttribute("text-anchor", "middle");
     this._text.setAttribute("font-size", "20px");
     this._text.setAttribute("fill", "#333");
@@ -61,12 +62,19 @@ export class GraficoDeRosca implements ComponentFramework.StandardControl<IInput
     const corRosca = context.parameters.CorRosca.raw || "#000"; // Obter o valor da propriedade "CorRosca"
     const corTexto = context.parameters.CorTexto.raw || "#000"; // Obter o valor da propriedade "CorTexto"
     const contracor = context.parameters.ContraCor.raw || "#f5f5f5"; // Obter o valor da propriedade "CorTexto"
+    const size = String(context.parameters.TamanhoTexto.raw) || "20";
+    const espessuraTexto = context.parameters.EspessuraTexto.raw || "Normal";
+    const esp = String(context.parameters.EspessuraRosca.raw)+"%" || "10%";
 
     // Calcular a porcentagem com base no valor (assumindo que o valor varia de 0 a 100)
     const porcentagem = Math.min(Math.max(valor, 0), 100);
 
     // Calcular o comprimento do traço do círculo de acordo com a porcentagem
     const comprimentoTraço = (251.2 * porcentagem) / 100;
+
+    //Atualiza a Espessura da rosca
+    this._backgroundCircle.setAttribute("stroke-width", esp);
+    this._circle.setAttribute("stroke-width", esp);
 
     // Atualizar o atributo "stroke-dashoffset" do círculo com uma animação suave
     this._circle.style.transition = "stroke-dashoffset 0.3s ease-in-out";
@@ -80,6 +88,25 @@ export class GraficoDeRosca implements ComponentFramework.StandardControl<IInput
 
     // Atualizar a cor do texto
     this._text.setAttribute("fill", corTexto);
+    this._text.setAttribute("font-size", size);
+
+    // Atualizar a espessura do texto
+    switch (espessuraTexto) {
+      case "Negrito":
+        this._text.setAttribute("font-weight", "bold");
+        break;
+      case "Seminegrito":
+        this._text.setAttribute("font-weight", "500");
+        break;
+      case "Normal":
+        this._text.setAttribute("font-weight", "normal");
+        break;
+      case "Mais Clara":
+        this._text.setAttribute("font-weight", "lighter");
+        break;
+      default:
+        this._text.setAttribute("font-weight", "normal");
+    }
 
     // Atualizar o texto exibido dentro do gráfico
     this._text.textContent = `${porcentagem}%`;
